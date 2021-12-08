@@ -84,34 +84,24 @@ def main(pm: PortMan) -> TuiConf:
         ),
     ).set(True)
 
+    scarlett.switch_mix_stereo("CD", 12).set(True)
+    scarlett.switch_mix_stereo("CD", 34).set(True)
     pyscarlett.dump_channels(scarlett.channels)
 
     def conf() -> Dict[str, ConnectionTrackProtocol]:
         tracks: Dict[str, ConnectionTrackProtocol] = {}
 
-        # Playback to headphones
-        tracks["Q"] = scarlett.switch_mix_stereo("CD", 12)
-        # Piano to headphones
-        tracks["W"] = scarlett.switch_mix_stereo("CD", 34)
+        # Playback to speakers
+        tracks["Q"] = scarlett.switch_mix_stereo("AB", 12)
+        # Piano to speakers
+        tracks["W"] = scarlett.switch_mix_stereo("AB", 34)
         # Orchestra to headphones
-        tracks["E"] = scarlett.switch_mix_stereo("CD", 56)
-        tracks["X"] = Swap(
-            tracks["Q"],
-            scarlett.switch_mix_stereo("AB", 12),
-            tracks["W"],
-            scarlett.switch_mix_stereo("AB", 34),
-        )
-        tracks["Z"] = Push(
-            tracks["Q"],
-            scarlett.switch_mix_stereo("AB", 12),
-            tracks["W"],
-            scarlett.switch_mix_stereo("AB", 34),
-        )
-        blue = "Blue Microphones Pro"
-        if blue in pm.clients and pm.clients[blue]["ports"]:
-            micout = pm.stereo_out_ref(blue)
-            micin = pm.stereo_speaker_ref(client_name, "23")
-            # tracks["Z"] = pm.multi_connection_track(micout, micin)
+        tracks["E"] = scarlett.switch_mix_stereo("CD", 56, 80)
+        # blue = "Blue Microphones Pro"
+        # if blue in pm.clients and pm.clients[blue]["ports"]:
+        #     micout = pm.stereo_out_ref(blue)
+        #     micin = pm.stereo_speaker_ref(client_name, "23")
+        #     # tracks["Z"] = pm.multi_connection_track(micout, micin)
         return tracks
 
     return conf

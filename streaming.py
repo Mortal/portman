@@ -24,7 +24,7 @@ def main(pm: PortMan) -> TuiConf:
     client_name = f"{device_name} USB Pro"
     assert client_name in pm.clients, client_name
     blue = "Blue Microphones Pro"
-    assert blue in pm.clients, blue
+    # assert blue in pm.clients, blue
 
     pm.set_default_sink(client_name)
     scarlett = Scarlett()
@@ -75,26 +75,27 @@ def main(pm: PortMan) -> TuiConf:
     ).set(True)
 
     headphones_monitor = pm.stereo_out_ref(client_name, "01")
-    mic_headphones = pm.stereo_speaker_ref(blue)
-    pm.multi_connection_track(headphones_monitor, mic_headphones).set(True)
+    if blue in pm.clients:
+        mic_headphones = pm.stereo_speaker_ref(blue)
+        pm.multi_connection_track(headphones_monitor, mic_headphones).set(True)
 
     def conf() -> Dict[str, ConnectionTrackProtocol]:
-        if blue not in pm.clients:
-            print("\r\x1b[KMissing %s" % blue)
-            return {}
         if client_name not in pm.clients:
             print("\r\x1b[KMissing %s" % client_name)
             return {}
         tracks: Dict[str, ConnectionTrackProtocol] = {}
-        micout = pm.stereo_out_ref(blue)
-        micin = pm.stereo_speaker_ref(client_name, "23")
-        tracks["Z"] = pm.multi_connection_track(micout, micin)
+        if blue in pm.clients:
+            micout = pm.stereo_out_ref(blue)
+            micin = pm.stereo_speaker_ref(client_name, "23")
+            tracks["Z"] = pm.multi_connection_track(micout, micin)
         tracks["X"] = scarlett.switch_mix_stereo("CD", 34)
         tracks["C"] = scarlett.switch_mix_stereo("CD", 12)
         onboard = "Built-in Audio Analog Stereo"
         laptop_speaker = pm.stereo_speaker_ref(onboard)
         # laptop_mic = pm.stereo_out_ref(onboard)
         tracks["S"] = pm.multi_connection_track(headphones_monitor, laptop_speaker)
+        if "Liesl" in pm.clients:
+            tracks["D"] = pm.multi_connection_track(headphones_monitor, pm.stereo_speaker_ref("Liesl"))
         return tracks
 
     return conf

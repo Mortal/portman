@@ -154,7 +154,12 @@ class PyalsaaudioEnumTrack(KeyedEqMixin):
 
     def set(self, v: bool) -> None:
         c, vs = self.mixer.getenum()
-        self.mixer.setenum(vs.index(self.on_setting if v else self.off_setting))
+        try:
+            i = vs.index(self.on_setting if v else self.off_setting)
+            self.mixer.setenum(i)
+        except alsaaudio.ALSAAudioError:
+            print(self.key, v, i, c, vs)
+            raise
 
     def __repr__(self) -> str:
         args = ", ".join(
@@ -282,7 +287,7 @@ class Scarlett:
         assert len(mixmix) == 2
         m, n = mixmix[0], mixmix[1]
         i, j = divmod(inpinp, 10)
-        return MultiConnectionTrack(self.switch_mix(m, i), self.switch_mix(n, j))
+        return MultiConnectionTrack(self.switch_mix(m, i, volume), self.switch_mix(n, j, volume))
 
 
 class Swap(KeyedEqMixin):
@@ -652,7 +657,10 @@ class PortMan:
             ports = {n: p for n, p in ports.items() if "playback" in n}
             res = []
             for c in channels:
-                p, = [p for n, p in ports.items() if c in n]
+                try:
+                    p, = [p for n, p in ports.items() if c in n]
+                except ValueError:
+                    raise Exception("Couldn't find port that contains %r among %r" % (c, ports.keys()))
                 res.append(p)
             return res
         port_names = set(ports.keys())
