@@ -47,12 +47,12 @@ def main(pm: PortMan) -> TuiConf:
     config = MultiConnectionTrack(
         # PCM outputs:
         scarlett.set_pcm_outputs(
-            "Mix A", "Mix B", "Mix C", "Mix D", "Mix E", "Mix F"
+            "Mix C", "Mix D", "Mix A", "Mix B", "Mix E", "Mix F"
         ),
         # Analogue outputs:
         scarlett.set_analogue_outputs(
-            # Analogue output 0+1 = piano out
-            # Analogue output 2+3 = sound fx out
+            # Analogue output 0+1 = sound fx out
+            # Analogue output 2+3 = piano out
             "Mix A",
             "Mix B",
             "Mix C",
@@ -73,12 +73,12 @@ def main(pm: PortMan) -> TuiConf:
                 "Off",
                 "Off",
             ],
-            [None, 0, 0, 0, 100, 0],
-            [0, None, 0, 0, 0, 100],
-            [0, 0, 100, 0, 0, 0],
-            [0, 0, 0, 100, 0, 0],
             [0, 0, None, 0, 100, 0],
             [0, 0, 0, None, 0, 100],
+            [100, 0, 0, 0, None, 0],
+            [0, 100, 0, 0, 0, None],
+            [None, 0, 0, 0, 100, 0],
+            [0, None, 0, 0, 0, 100],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
         ),
@@ -96,9 +96,11 @@ def main(pm: PortMan) -> TuiConf:
         tracks: Dict[str, ConnectionTrackProtocol] = {}
 
         # Playback to speakers
-        tracks["Q"] = scarlett.switch_mix_stereo("AB", 12)
+        tracks["Q"] = scarlett.switch_mix_stereo("AB", 56)
         # Piano to speakers
-        tracks["W"] = scarlett.switch_mix_stereo("AB", 34)
+        tracks["W"] = scarlett.switch_mix_stereo("CD", 12)
+        # Playthrough to monitor
+        tracks["Z"] = scarlett.switch_mix_stereo("EF", 34)
         return tracks
 
     return conf
