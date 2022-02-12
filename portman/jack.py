@@ -4,7 +4,7 @@ from typing import Dict, Optional
 
 import jack
 
-from .base import PortMan, Client
+from .base import PortMan, Client, PortRef
 
 
 class PortManJack(PortMan):
@@ -150,7 +150,6 @@ class PortManJack(PortMan):
             print(e)
 
         jackconn.__enter__()
-        self.clients: Dict[str, Client] = {}
         for port in jackconn.get_ports():
             ref = self._jack_port_name_to_ref(port.name)
             # print(repr(port), repr(ref))
@@ -161,3 +160,19 @@ class PortManJack(PortMan):
             for connection in jackconn.get_all_connections(port):
                 connref = self._jack_port_name_to_ref(connection.name)
                 portconns[connref] = None
+
+    def unregister(self):
+        self._conn.__exit__(None, None, None)
+        super().unregister()
+
+    def _jack_port_name_to_ref(self, port_name: str) -> PortRef:
+        remote_client, shortname = port_name.split(":", 1)
+        try:
+            real_client = self._real_remote_client[remote_client]
+        except KeyError:
+            real_client = self._real_remote_client[
+                remote_client
+            ] = self._conn.get_client_name_by_uuid(
+                self._conn.get_uuid_for_client_name(remote_client)
+            )
+        return PortRef(real_client, remote_client, shortname)

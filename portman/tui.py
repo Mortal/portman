@@ -10,6 +10,8 @@ from typing import (
     Iterator,
 )
 
+from portman.base import ConnectionTrackProtocol, PortMan
+
 
 @contextlib.contextmanager
 def get_rawchars() -> Iterator[Iterator[str]]:
@@ -39,9 +41,10 @@ def tuiwrapper(fn: Callable[[PortMan], TuiConf]) -> Callable[[], None]:
     def wrapper() -> None:
         with contextlib.ExitStack() as stack:
             try:
-                pm = stack.enter_context(PortMan())
-            except jack.JackOpenError:
-                if not os.environ.get("PORTMAN_INNER"):
+                from portman.jack import PortManJack
+                pm = stack.enter_context(PortManJack())
+            except Exception as e:
+                if "JackOpenError" in e.__class__.__name__ and not os.environ.get("PORTMAN_INNER"):
                     print("Trying to re-exec with pw-jack...")
                     os.execvpe(
                         "pw-jack",
@@ -49,7 +52,6 @@ def tuiwrapper(fn: Callable[[PortMan], TuiConf]) -> Callable[[], None]:
                         {**os.environ, "PORTMAN_INNER": "1"},
                     )
                 raise
-        with PortMan() as pm:
             conf = fn(pm)
 
             keys: TuiKeys = {}

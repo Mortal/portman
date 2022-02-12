@@ -183,30 +183,25 @@ class PortMan:
                 traceback.print_exc()
 
     def __enter__(self) -> "PortMan":
+        self.clients: Dict[str, Client] = {}
         self.register()
         return self
         
     def register(self) -> None:
         pass
 
-    def _jack_port_name_to_ref(self, port_name: str) -> PortRef:
-        remote_client, shortname = port_name.split(":", 1)
-        try:
-            real_client = self._real_remote_client[remote_client]
-        except KeyError:
-            real_client = self._real_remote_client[
-                remote_client
-            ] = self._conn.get_client_name_by_uuid(
-                self._conn.get_uuid_for_client_name(remote_client)
-            )
-        return PortRef(real_client, remote_client, shortname)
+    graph_reordered: Optional[threading.Event] = None
 
     def __exit__(self, exb, exv, ext) -> None:
         if self.graph_reordered is not None:
             g = self.graph_reordered
             self.graph_reordered = None
             g.set()
-        self._conn.__exit__(exb, exv, ext)
+        if exb is None:
+            self.unregister()
+
+    def unregister(self) -> None:
+        pass
 
     def print_all_clients(self) -> None:
         for client_name, client in self.clients.items():
@@ -270,6 +265,13 @@ class PortMan:
             "playback_AUX1",
         }:
             return [ports["capture_AUX0"], ports["capture_AUX1"]]
+        if port_names == {
+            "playback_AUX0",
+            "capture_AUX0",
+            "capture_AUX1",
+            "playback_AUX1",
+        }:
+            return [ports["capture_AUX0"], ports["capture_AUX1"]]
         raise Exception("Don't know how to get a stereo ref from %r" % port_names)
 
     def stereo_speaker_ref(
@@ -310,6 +312,13 @@ class PortMan:
             "capture_AUX1",
             "monitor_AUX0",
             "monitor_AUX1",
+            "playback_AUX0",
+            "playback_AUX1",
+        }:
+            return [ports["playback_AUX0"], ports["playback_AUX1"]]
+        if port_names == {
+            "capture_AUX0",
+            "capture_AUX1",
             "playback_AUX0",
             "playback_AUX1",
         }:
