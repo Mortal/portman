@@ -1,13 +1,12 @@
 from typing import Dict
 
-from portman import (
+from portman.jack import PortManJack as PortMan
+from portman.base import (
     ConnectionTrackProtocol,
     MultiConnectionTrack,
-    PortMan,
-    Scarlett,
-    TuiConf,
-    tuiwrapper,
 )
+from portman.scarlett import Scarlett
+from portman.tui import tuiwrapper, TuiConf
 
 
 @tuiwrapper
