@@ -30,12 +30,12 @@ def main(pm: PortMan) -> TuiConf:
     MultiConnectionTrack(
         # PCM outputs:
         scarlett.set_pcm_outputs(
-            "Mix C",  # "Analogue 1",
-            "Mix D",  # "Analogue 2",
+            "Mix C",
+            "Mix D",
             "Analogue 3",
             "Analogue 4",
-            None,  # "Mix E",
-            None,  # "Mix F",
+            None,
+            None,
         ),
         # Analogue outputs:
         scarlett.set_analogue_outputs(
