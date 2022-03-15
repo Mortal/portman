@@ -30,12 +30,12 @@ def main(pm: PortMan) -> TuiConf:
     MultiConnectionTrack(
         # PCM outputs:
         scarlett.set_pcm_outputs(
+            "Mix C",  # "Analogue 1",
+            "Mix D",  # "Analogue 2",
             "Analogue 3",
             "Analogue 4",
-            "Analogue 3",
-            "Analogue 4",
-            "Mix E",
-            "Mix F",
+            None,  # "Mix E",
+            None,  # "Mix F",
         ),
         # Analogue outputs:
         scarlett.set_analogue_outputs(
@@ -43,8 +43,8 @@ def main(pm: PortMan) -> TuiConf:
             # Analogue output 2+3 = headphones
             "Mix A",
             "Mix B",
-            "Mix A",
-            "Mix B",
+            "Mix C",
+            "Mix D",
         ),
         scarlett.set_mix(
             # Mixer Inputs:
@@ -68,8 +68,8 @@ def main(pm: PortMan) -> TuiConf:
             [0, 100, 0, 100, 0, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
-            [80, 0, 80, 0, 100, 0],
-            [0, 80, 0, 80, 0, 100],
+            [80, 0, 80, 0, 0, 0],
+            [0, 80, 0, 80, 0, 0],
         ),
     ).set(True)
 
@@ -95,7 +95,6 @@ def main(pm: PortMan) -> TuiConf:
         tracks["S"] = pm.multi_connection_track(headphones_monitor, laptop_speaker)
         if "Liesl" in pm.clients:
             tracks["D"] = pm.multi_connection_track(headphones_monitor, pm.stereo_speaker_ref("Liesl"))
-        scarlett.switch_analogue_output
         return tracks
 
     return conf
