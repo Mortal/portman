@@ -59,6 +59,7 @@ FIXED = [
     "Line In 2 Air",
     "Line In 2 Level",
     "Line In 2 Pad",
+    "Standalone",
 ]
 C_PCM = "PCM %02d"
 C_INPUT = "Mixer Input %02d"
